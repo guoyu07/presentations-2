@@ -1,0 +1,325 @@
+<!--
+Google IO 2012 HTML5 Slide Template
+
+Authors: Eric Bidelman <ebidel@gmail.com>
+         Luke Mahé <lukem@google.com>
+
+URL: https://code.google.com/p/io-2012-slides
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Presentation</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">-->
+  <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <!--This one seems to work all the time, but really small on ipad-->
+  <!--<meta name="viewport" content="initial-scale=0.4">-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" media="all" href="css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="css/phone.css">
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->
+  <script data-main="js/slides" src="js/require-1.0.8.min.js"></script>
+</head>
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+    <aside class="gdbar"><img src="images/coding.png"></aside>
+    <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+    </hgroup>
+  </slide>
+
+  
+  <slide>
+    <hgroup>
+      <h2>今天的目标</h2>
+    </hgroup>
+    <article class="none">
+      <p><h3>事不过三</h3></p>
+      <ul class="build">
+        <li>为什么框架安全是小强（小而强大）</li>
+        <li>将一些著名的安全漏洞串联一下</li>
+        <li>What, Why, How</li>
+      </ul>
+      <aside class="note">
+        <section>
+      1. 框架是在SDL中重要的一环。因为首先其在一个公司的互联网产品中广泛被使用；其次他的内容尤其是开源框架很少被公司控制，但是被外界所广而知晓；再次从产品生命周期的角度来说，框架包括了开发和测试的两大方面；<br />
+      2. 串联安全漏洞的目的是为了引起大家的注意，主要还是为了告知为何框架安全如此重要。<br />
+      3. 什么是，为什么会这样，怎么解决<br/>
+      </section>
+      </aside>
+    </article>
+  </slide>
+
+<slide>
+<hgroup>
+<h2>什么是开发框架</h2>
+</hgroup>
+<article class="none">
+  <p>框架是可以被应用开发者定制的应用骨架，是一个可复用的构件</p>
+  <p>简而言之，框架就是制定一套规范或者规则（思想），程序员在该规范或者规则（思想）下工作。别人搭建好舞台，你来表演。</p>
+  <ul class="build fade">
+  <li>开发成本低<ul>
+    <li>复用性</li>
+    <li>易用性</li>
+    <li>学习成本低</li>
+    <li>可维护性高</li>
+    </ul>
+  </li>
+  <li>分层思想<ul>
+  <li>并行开发</li>
+  </ul>
+  </li>
+  <li>部署方便<ul>
+  <li>可伸缩性</li>
+  </ul>
+  </li>
+  </ul>
+</article>
+<aside class="note">
+  <section>
+    所有开发框架的优点和特性，同时也是他们的原罪。
+  </section>
+</aside>
+</slide>
+
+<slide>
+<hgroup>
+<h2>复用性</h2>
+<h3>不重复制造轮子 = 不透明性</h3>
+</hgroup>
+<article class="none">
+<p><a href="http://zone.wooyun.org/content/205">struts csrftoken 绕过</a></p>
+<pre class="prettyprint" data-lang="html">&lt;form id=&quot;login&quot; name=&quot;login&quot; action=&quot;/st/login.action&quot; method=&quot;post&quot;&gt; 
+&lt;table class=&quot;wwFormTable&quot;&gt; 
+    &lt;input type=&quot;hidden&quot; <b>name=&quot;struts.token.name&quot; value=&quot;struts.token&quot;</b> /&gt; 
+    &lt;input type=&quot;hidden&quot; <b>name=&quot;struts.token&quot;</b> value=&quot;PBE0GTZRMERTXRZESK1076RIS1PNTNT9&quot; /&gt; 
+    &lt;tr&gt;
+&lt;/table&gt;&lt;/form&gt;
+</pre>
+</article>
+</slide>
+
+<slide>
+<hgroup>
+<h2>复用性</h2>
+<h3>不重复制造轮子 = 不透明性</h3>
+</hgroup>
+<article class="none">
+<p>struts 2.2之前的<a href="http://struts.apache.org/release/2.0.x/docs/file-upload-interceptor.html#FileUploadInterceptor-Parameters">upload文档</a>存在问题</p>
+<pre class="prettyprint" data-lang="xml">&lt;action name=&quot;doUpload&quot; class=&quot;com.example.UploadAction&quot;&gt;
+    &lt;interceptor-ref name=&quot;basicStack&quot;/&gt;
+    &lt;interceptor-ref name=&quot;fileUpload&quot;&gt;
+        <b>&lt;param name=&quot;allowedTypes&quot;&gt;image/jpeg,image/gif&lt;/param&gt;</b>
+    &lt;/interceptor-ref&gt; 
+    &lt;interceptor-ref name=&quot;validation&quot;/&gt;
+    &lt;interceptor-ref name=&quot;workflow&quot;/&gt;
+
+    &lt;result name=&quot;success&quot;&gt;good_result.jsp&lt;/result&gt;
+&lt;/action&gt;
+</pre>
+</article>
+</slide>
+
+<slide>
+<hgroup>
+<h2>复用性</h2>
+<h3>不重复制造轮子 = 不透明性</h3>
+</hgroup>
+<article class="smaller">
+<p><b>php不同模块处理MySQL多语句不一致</b></p>
+</ul>
+<p>php-src/ext/mysqlnd/mysqlnd_enum_n_def.h</p>
+<pre class="prettyprint" data-lang="c">
+<b>#define CLIENT_MULTI_STATEMENTS    (1UL &lt;&lt; 16) /* Enable/disable multi-stmt support */</b>
+</pre>
+<p>php-src/ext/<b>mysqli</b>/mysqli_nonapi.c </p>
+<pre class="prettyprint" data-lang="c"> 
+    /* remove some insecure options */ 
+    <b>flags &= ~CLIENT_MULTI_STATEMENTS;   /* don't allow multi_queries via connect parameter */</b>
+</pre>
+<p>php-src/ext/<b>pdo_mysql</b>/mysql_driver.c</p>
+<pre class="prettyprint" data-lang="c"> 
+<b>#ifdef CLIENT_MULTI_STATEMENTS 
+    |CLIENT_MULTI_STATEMENTS</b>
+</pre>
+</article>
+</slide>
+
+<slide>
+<hgroup>
+<h2>易用性</h2>
+</hgroup>
+<article class="flexbox vcenter">
+<ul>
+<li><a href="http://pythoner.net/admin/">Django Admin</a></li>
+<li><a href="http://123.163.com/mobiletools/dwr/test/DownloadBean">DWR的默认测试组件</a></li>
+<li><a href="https://github.com/rails/rails/issues/5228">Ruby on Rails</a>/Struts的数据对象更新</li>
+</ul>
+<aside class="note">
+  <section>
+Github被黑事件：<br />
+<ul>
+<li>Rails的源代码被更改，作者留下了这么一句话：</li>
+<p>As you see github is vulnerable. Because gh devs are bad? Or who's in charge?</p>
+<li>Rails回应：</li>
+<p>Rails is <span class="red">not</span> in charge, it is your responsibility to secure your application. </p>
+</ul>
+</section>
+</aside>
+</article>
+</slide>
+
+<slide class="segue dark nobackground">
+<hgroup>
+</hgroup>
+<article class="flexbox vleft auto-fadein">
+<p><h2>框架会使人变笨么？</h2></p>
+<img src="images/steam.jpg" width="600" hight="400"/>
+<aside class="note">
+框架使编程开发成为一个产业化工程化流程化的东西。大多数开发者只需要简单的培训即可照葫芦画瓢的，或者是搭积木的方式撰写出多种多样的应用软件。
+
+其实框架的本来目标也是为了让编程更容易上手，因此也不得不照顾到那些开发新手们的需求。既然如此，对于安全也是一样。
+
+secure by default。这件事微软学了10年，框架们要学多少年？
+</aside>
+</article>
+</slide>
+
+<slide>
+<hgroup>
+<h2>分层思想</h2>
+<h3>代码调度</h3>
+</hgroup>
+<article class="smaller">
+<ul>
+<li><a href="http://zone.wooyun.org/content/44">thinkphp代码执行漏洞</a></li>
+<p>为了支持url的pathinfo, thinkphp利用如下代码进行代码调度：</p>
+</ul>
+<pre class="prettyprint" data-lang="php">$res = preg_replace(
+  '@(w+)'.$depr.'([^'.$depr.'\/]+)@e', 
+  '$var[\'\\1\']=<b>\'\\2\'</b>;', 
+  implode($depr,$paths));
+
+$res = preg_replace(
+  '@(w+)'.$depr.'([^'.$depr.'\/]+)@e', 
+  '$var[\'\\1\']=<b>&quot;\\2&quot;</b>;', 
+  implode($depr,$paths));
+</pre>
+<ul>
+<li>struts的DMI（动态方法调用）</li>
+</ul>
+</article>
+</slide>
+
+<slide>
+<hgroup>
+<h2>部署方便</h2>
+<h3>可伸缩性</h3>
+</hgroup>
+<article class="none">
+  <p>分层架构之后导致前后端沟通成本增加，同样的，需要分别做安全处理</p>
+<ul>
+<li>Fcgi系列安全问题&nbsp;&nbsp;<span class="gray2">(http = fastcgi 前后端交流协议)</span><ul class="build fade">
+<li>Nginx/IIS + PHP-FPM任意代码执行</li>
+<li>PHP-FPM jailbreak</li>
+</ul>
+</li>
+<li>Struts的ognl系列安全漏洞&nbsp;&nbsp;<span class="gray2">(ognl = java = html 模板语言)</span></li>
+<p>是的，这是一个系列，而<span class="red"><b>不是“一个”</b></span>漏洞</p>
+<li>Ruby on rails的yaml，json数据&nbsp;&nbsp;<span class="gray2">(json = yaml  =  ruby 配置文件及rpc)</span></li>
+</ul>
+<aside class="note">
+  <section>
+    YAML is a format for structuring data in a file, like XML. Rails uses YAML to configure your databases, but it does so in such a way that you hardly notice.  Rails parses parameters based on the Content-Type of the request. 
+  </section>
+</aside>
+</article>
+</slide>
+
+<slide>
+<hgroup>
+<h2>让我们再回顾一下总结出来的问题</h2>
+</hgroup>
+<article class="none">
+<ul>
+<li>不透明</li>
+<li>责任到底在哪？</li>
+<li>文档不够完善</li>
+<li>开发者总体素质降低</li>
+<li>沟通成本增高</li>
+</ul>
+<aside class="note">
+  <section>
+    安全人员应该负责？还是开发人员应该负责？
+    摒弃所有开发框架么？如果不是，怎么选择好的框架？如果是，那强迫大家最原始开发？
+  </section>
+</aside>
+</article>
+</slide>
+
+<slide class="segue dark quote nobackground">
+<article class="flexbox vcenter auto-fadein">
+<h2>解决方法？</h2>
+</article>
+</slide>
+
+<slide class="segue dark quote nobackground">
+<article class="flexbox vleft auto-fadein">
+<q>学我者生，用我者死</q>
+<div class="author">—— 齐白石</div>
+<aside class="note">
+学我者生，似我者死（原句）：这是一种解决方法，就是强迫程序员去了解框架，用不断洗脑和不断培训，不断安全测试提供case的方式让他们去了解。知道痛了才会有行动。
+</aside>
+</article>
+</slide>
+
+<slide class="segue dark quote nobackground">
+<article class="flexbox vleft auto-fadein">
+<q>乘隙插足，扼其主机，渐之进也。</q>
+<div class="author">—— 《孙子兵法》</div>
+<aside class="note">
+  <section>
+<p>反客为主：这是另一种方法。上一种太过刚强，过刚易折，还难保不疏漏。那么另一种方式就是，利用这些框架的统一性的特点：</p>
+   <p> 分离共用组件</p>
+   <p> 底层默认安全化</p>
+<ul>
+  <li>1. 模板自动过滤</li>
+  <li>2. csrftoken自动验证</li>
+  <li>3. sso统一认证</li>
+  <li>4. 隐私和权限控制</li>
+  <li>5. 上传文件的统一验证方案</li>
+</ul>
+</section>
+</aside>
+</article>
+</slide>
+
+<slide class="thank-you-slide segue nobackground">
+    <aside class="gdbar right"><img src="images/coding.png"></aside>
+    <article class="flexbox vleft auto-fadein">
+      <h2>Any Questions?</h2>
+      <p>联系方式：</p>
+    </article>
+    <p class="auto-fadein" data-config-contact>
+      <!-- populated from slide_config.json -->
+    </p>
+</slide>
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<!--[if IE]>
+  <script src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+  <script>CFInstall.check({mode: 'overlay'});</script>
+<![endif]-->
+</body>
+</html>
